@@ -817,7 +817,7 @@ MFRC522::StatusCode MFRC522Extended::TCL_Transceive(TagInfo *tag, byte *sendData
 	// Swap block number on success
 	tag->blockNumber = !tag->blockNumber;
 
-	if (backData && (backLen > 0)) {
+	if (backData && (backLen != nullptr)) {
 		if (*backLen < in.inf.size)
 			return StatusCode::STATUS_NO_ROOM;
 
@@ -837,10 +837,10 @@ MFRC522::StatusCode MFRC522Extended::TCL_Transceive(TagInfo *tag, byte *sendData
 		byte ackDataSize = FIFO_SIZE;
 		byte linked = 0;
 		result = TCL_TransceiveRBlock(tag, true, ackData, &ackDataSize, &linked);
-		if (result != STATUS_OK)
+		if (result !=  StatusCode::STATUS_OK)
 			return result;
 
-		if (backData && (backLen > 0)) {
+		if (backData && (backLen != nullptr)) {
 			if ((*backLen + ackDataSize) > totalBackLen)
 				return StatusCode::STATUS_NO_ROOM;
 
