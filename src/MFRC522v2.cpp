@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: LGPL-2.1 */
 #include "MFRC522v2.h"
-
+void printHex(byte *buffer, uint16_t bufferSize);
 /////////////////////////////////////////////////////////////////////////////////////
 // Functions for setting up the Arduino
 /////////////////////////////////////////////////////////////////////////////////////
@@ -394,6 +394,10 @@ MFRC522::StatusCode MFRC522::PCD_CommunicateWithPICC(byte command,    ///< The c
     PCD_SetRegisterBitMask(PCD_Register::BitFramingReg, 0x80);  // StartSend=1, transmission of data starts
   }
   
+  Serial.print("---> ");
+  printHex(sendData, sendLen);
+  Serial.print("\n");
+
   // Wait for the command to complete.
   // In PCD_Init() we set the TAuto flag in TModeReg. This means the timer automatically starts when the PCD stops transmitting.
   // Each iteration of the do-while-loop takes 17.86μs.
@@ -402,14 +406,20 @@ MFRC522::StatusCode MFRC522::PCD_CommunicateWithPICC(byte command,    ///< The c
   for(i = 2000; i > 0; i--) {
     byte n = _driver.PCD_ReadRegister(PCD_Register::ComIrqReg);  // ComIrqReg[7..0] bits are: Set1 TxIRq RxIRq IdleIRq HiAlertIRq LoAlertIRq ErrIRq TimerIRq
     if(n & waitIRq) {          // One of the interrupts that signal success has been set.
+      // Serial.print("waitIrg match\n");
       break;
     }
     if(n & 0x01) {            // Timer interrupt - nothing received in 25ms
+      //  Serial.print("Timer interrupt match\n");
       return StatusCode::STATUS_TIMEOUT;
     }
   }
   // 35.7ms and nothing happened. Communication with the MFRC522 might be down.
   if(i == 0) {
+    //  Serial.print("countdown to zero\n");
+    //  printHex(sendData, sendLen);
+    //       Serial.print("\n\n");
+
     return StatusCode::STATUS_TIMEOUT;
   }
   
@@ -429,6 +439,11 @@ MFRC522::StatusCode MFRC522::PCD_CommunicateWithPICC(byte command,    ///< The c
     }
     *backLen = n;                      // Number of bytes returned
     _driver.PCD_ReadRegister(PCD_Register::FIFODataReg, n, backData, rxAlign);  // Get received data from FIFO
+
+  Serial.print("<---- ");
+  printHex(backData, n);
+  Serial.print("\n");
+
     _validBits = _driver.PCD_ReadRegister(PCD_Register::ControlReg) & 0x07;    // RxLastBits[2:0] indicates the number of valid bits in the last received byte. If this value is 000b, the whole byte is valid.
     if(validBits) {
       *validBits = _validBits;

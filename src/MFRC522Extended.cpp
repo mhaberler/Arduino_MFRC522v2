@@ -1070,6 +1070,7 @@ void MFRC522Extended::PICC_DumpDetailsToSerial(TagInfo *tag	///< Pointer to TagI
 	Serial.print(F("PICC type: "));
 	Serial.println(MFRC522Debug::PICC_GetTypeName(piccType));
 } // End PICC_DumpDetailsToSerial()
+#endif
 
 /**
  * Dumps memory contents of a ISO-14443-4 PICC.
@@ -1090,7 +1091,7 @@ void MFRC522Extended::PICC_DumpISO14443_4(TagInfo *tag)
 	}
 	
 } // End PICC_DumpISO14443_4
-#endif
+
 
 /////////////////////////////////////////////////////////////////////////////////////
 // Convenience functions - does not add extra functionality
