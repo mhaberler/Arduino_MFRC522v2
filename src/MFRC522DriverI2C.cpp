@@ -7,7 +7,7 @@
 
 bool MFRC522DriverI2C::init() {
   // TODO avoid double init.
-  _wire.begin(); // Returns type void, no check possible.
+  // _wire.begin(); // Returns type void, no check possible.
   return true;
 }
 
